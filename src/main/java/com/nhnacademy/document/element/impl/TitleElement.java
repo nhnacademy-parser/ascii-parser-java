@@ -1,6 +1,6 @@
 package com.nhnacademy.document.element.impl;
 
-import com.nhnacademy.document.element.abs.DocsElement;
+import com.nhnacademy.document.element.DocsElement;
 import com.nhnacademy.document.visitor.Visitor;
 
 /**
@@ -16,7 +16,8 @@ public class TitleElement extends DocsElement {
     }
 
     @Override
-    public String accept(Visitor visitor) {
+    public Object accept(Visitor visitor) {
         return visitor.visit(this);
     }
+
 }

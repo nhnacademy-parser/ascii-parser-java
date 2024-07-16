@@ -1,7 +1,7 @@
 package com.nhnacademy.document.element.impl;
 
 import com.nhnacademy.document.convertor.HtmlConverter;
-import com.nhnacademy.document.element.abs.DocsElement;
+import com.nhnacademy.document.element.DocsElement;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
@@ -128,6 +130,64 @@ class AsciiDocsDictionaryTest {
                     }
 
                 }
+            } else if (s.startsWith("|===")) {
+
+                Pattern tablePattern = Pattern.compile("\\|===$");
+                Matcher matcher = tablePattern.matcher(s);
+
+                if (matcher.find()) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while ((s = bufferedReader.readLine()) != null) {
+                        if (tablePattern.matcher(s).find()) {
+                            break;
+                        }
+                        stringBuilder.append(s).append("\n");
+                    }
+                    docsElement = new TableElement(stringBuilder.toString());
+                }
+
+            } else if (s.startsWith("[")) {
+                Matcher matcher = Pattern.compile("\\[.+]$").matcher(s);
+
+                if (matcher.find()) {
+                    String attributes = matcher.group();
+                    String[] temp = new String[3];
+                    String[] copy = attributes.substring(1, attributes.length() - 1).split(",");
+
+                    System.arraycopy(copy, 0, temp, 0, Math.min(copy.length, 3));
+
+                    docsElement = new AttributeElement(temp[0], temp[1], temp[2]);
+                }
+
+            } else if (s.startsWith("_")) {
+
+                Pattern quotePattern = Pattern.compile("____");
+                Matcher matcher = quotePattern.matcher(s);
+
+                if (matcher.find()) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while ((s = bufferedReader.readLine()) != null) {
+                        if (quotePattern.matcher(s).find()) {
+                            break;
+                        }
+                        stringBuilder.append(s).append("\n");
+                    }
+                    QuotationElement element = new QuotationElement(stringBuilder.toString());
+
+                    DocsElement lastElement = docsElements.removeLast();
+                    if (lastElement instanceof AttributeElement attributeElement) {
+                        element.addAttributes(attributeElement);
+                    }
+                    docsElement = element;
+                }
+
+            } else if (s.startsWith("//")){
+                Pattern commentPattern = Pattern.compile("//");
+                Matcher matcher = commentPattern.matcher(s);
+
+                if (matcher.find()) {
+                    docsElement = new CommentElement(matcher.replaceAll(""));
+                }
             }
 
             docsElements.add(docsElement);
@@ -137,7 +197,7 @@ class AsciiDocsDictionaryTest {
 
         HtmlConverter htmlConverter = new HtmlConverter();
         for (DocsElement docsElement : docsElements) {
-            String string = docsElement.accept(htmlConverter);
+            String string = docsElement.accept(htmlConverter).toString();
             builder.append(string).append("\n");
         }
 

@@ -1,8 +1,6 @@
-package com.nhnacademy.document.element.abs;
+package com.nhnacademy.document.element;
 
-import com.nhnacademy.document.element.Element;
 import com.nhnacademy.document.visitor.Visitor;
-import java.util.List;
 import lombok.Getter;
 
 /**
@@ -13,14 +11,18 @@ import lombok.Getter;
 @Getter
 public class DocsElement implements Element {
 
-    String value;
+    Object value;
 
-    public DocsElement(String value) {
+    public DocsElement(Object value) {
         this.value = value;
     }
 
+    protected DocsElement() {
+        value = "";
+    }
+
     @Override
-    public String accept(Visitor visitor) {
+    public Object accept(Visitor visitor) {
         return visitor.visit(this);
     }
 }

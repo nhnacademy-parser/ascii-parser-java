@@ -10,5 +10,5 @@ import com.nhnacademy.document.visitor.Visitor;
 
 public interface Element {
 
-    String accept(Visitor visitor);
+    Object accept(Visitor visitor);
 }

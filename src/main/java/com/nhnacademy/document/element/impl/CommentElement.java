@@ -9,9 +9,9 @@ import com.nhnacademy.document.visitor.Visitor;
  */
 
 
-public class ExampleElement extends DocsElement {
-    public ExampleElement(String string) {
-        super(string);
+public class CommentElement extends DocsElement {
+    public CommentElement(String s) {
+        super(s);
     }
 
     @Override
