@@ -248,6 +248,61 @@ class AsciiDocsDictionaryTest {
                     continue;
                 }
 
+            } else if (s.contains("*")) { // 좌우 스플릿 후 recursion 형태로 해야할 필요성이 보임.
+                Pattern boldPattern = Pattern.compile("\\*(.*)\\*");
+
+                Matcher matcher = boldPattern.matcher(s);
+
+                if (matcher.find()) {
+                    String temp = matcher.group().substring(1, matcher.group().length() - 1);
+
+                    String preString = s.substring(0, matcher.start());
+                    String postString = s.substring(matcher.end());
+
+                    docsElements.add(new DocsElement(preString));
+
+                    docsElement = new BoldTextElement(temp);
+                    docsElements.add(docsElement);
+
+                    docsElements.add(new DocsElement(postString));
+                    continue;
+                }
+            } else if (s.contains("_")) {
+                Pattern italicPattern = Pattern.compile("_(.*)_");
+                Matcher matcher = italicPattern.matcher(s);
+
+                if (matcher.find()) {
+                    String temp = matcher.group().substring(1, matcher.group().length() - 1);
+
+                    String preString = s.substring(0, matcher.start());
+                    String postString = s.substring(matcher.end());
+
+                    docsElements.add(new DocsElement(preString));
+
+                    docsElement = new ItalicTextElement(temp);
+                    docsElements.add(docsElement);
+
+                    docsElements.add(new DocsElement(postString));
+                    continue;
+                }
+            } else if (s.contains("footnote:")) {
+                Pattern footnotePattern = Pattern.compile("footnote:\\[(.*)]");
+                Matcher matcher = footnotePattern.matcher(s);
+
+                if (matcher.find()) {
+                    String temp = matcher.group();
+
+                    String preString = s.substring(0, matcher.start());
+                    String postString = s.substring(matcher.end());
+
+                    docsElements.add(new DocsElement(preString));
+
+                    docsElement = new FootNoteElement(temp);
+                    docsElements.add(docsElement);
+
+                    docsElements.add(new DocsElement(postString));
+                    continue;
+                }
             }
 
             docsElements.add(docsElement);

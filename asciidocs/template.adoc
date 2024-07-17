@@ -9,7 +9,8 @@ Content entered directly below the header but before the first section heading i
 
 == First level heading
 
-This is a paragraph with a *bold* word and an _italicized_ word.
+This is a paragraph with an _italicized_ word.
+This is a paragraph with a *bold* word.
 
 .Image caption
 image::image-file-name.png[I am the image alt text.]

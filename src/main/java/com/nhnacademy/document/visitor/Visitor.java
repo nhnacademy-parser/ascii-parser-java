@@ -3,11 +3,14 @@ package com.nhnacademy.document.visitor;
 import com.nhnacademy.document.element.DocsElement;
 import com.nhnacademy.document.element.impl.AnchorElement;
 import com.nhnacademy.document.element.impl.AttributeElement;
+import com.nhnacademy.document.element.impl.BoldTextElement;
 import com.nhnacademy.document.element.impl.CommentElement;
 import com.nhnacademy.document.element.impl.CrossReferenceElement;
 import com.nhnacademy.document.element.impl.ExampleElement;
+import com.nhnacademy.document.element.impl.FootNoteElement;
 import com.nhnacademy.document.element.impl.HeadingElement;
 import com.nhnacademy.document.element.impl.ImageElement;
+import com.nhnacademy.document.element.impl.ItalicTextElement;
 import com.nhnacademy.document.element.impl.OrderedListElement;
 import com.nhnacademy.document.element.impl.QuotationElement;
 import com.nhnacademy.document.element.impl.SideBarElement;
@@ -46,6 +49,12 @@ public interface Visitor {
     String visit(CrossReferenceElement element);
 
     String visit(AnchorElement element);
+
+    String visit(ItalicTextElement element);
+
+    String visit(BoldTextElement element);
+
+    String visit(FootNoteElement element);
 
     String visit(DocsElement element);
 }
