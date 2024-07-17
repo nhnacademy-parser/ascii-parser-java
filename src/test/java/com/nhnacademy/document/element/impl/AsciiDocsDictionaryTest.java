@@ -12,8 +12,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
@@ -146,7 +144,7 @@ class AsciiDocsDictionaryTest {
                     docsElement = new TableElement(stringBuilder.toString());
                 }
 
-            } else if (s.startsWith("[")) {
+            } else if (s.startsWith("[")) { // Quotation Attribute
                 Matcher matcher = Pattern.compile("\\[.+]$").matcher(s);
 
                 if (matcher.find()) {
@@ -159,7 +157,7 @@ class AsciiDocsDictionaryTest {
                     docsElement = new AttributeElement(temp[0], temp[1], temp[2]);
                 }
 
-            } else if (s.startsWith("_")) {
+            } else if (s.startsWith("_")) { // Quotation
 
                 Pattern quotePattern = Pattern.compile("____");
                 Matcher matcher = quotePattern.matcher(s);
@@ -181,13 +179,75 @@ class AsciiDocsDictionaryTest {
                     docsElement = element;
                 }
 
-            } else if (s.startsWith("//")){
+            } else if (s.startsWith("//")) { // Comment
                 Pattern commentPattern = Pattern.compile("//");
                 Matcher matcher = commentPattern.matcher(s);
 
                 if (matcher.find()) {
                     docsElement = new CommentElement(matcher.replaceAll(""));
                 }
+
+
+            } else if (s.startsWith(":")) {
+
+            } else if (s.contains("<<")) { //
+                Pattern crossRefPattern = Pattern.compile("<<+.+>>");
+                Matcher matcher = crossRefPattern.matcher(s);
+
+                if (matcher.find()) {
+                    String temp = matcher.group();
+                    docsElements.add(new DocsElement(matcher.replaceAll("")));
+
+                    Pattern angleBracket = Pattern.compile("[<>]");
+                    Matcher matcher1 = angleBracket.matcher(temp);
+                    temp = matcher1.replaceAll("");
+                    String[] strings = temp.split(",");
+
+                    docsElement = new CrossReferenceElement(strings[0], strings[1]);
+                }
+            } else if (s.contains("://")) { // protocol ref
+                Pattern protocolIncludeAltTextPattern = Pattern.compile("(\\S+://)(.+)(\\[(.*)])");
+                Pattern protocolExcludeAltTextPattern = Pattern.compile("(\\S+://[^ .]+)");
+
+                Matcher matcher = protocolIncludeAltTextPattern.matcher(s);
+
+                if (matcher.find()) {
+                    String temp = matcher.group();
+
+                    String preString = s.substring(0, matcher.start());
+                    String postString = s.substring(matcher.end());
+
+                    docsElements.add(new DocsElement(preString));
+
+                    matcher = Pattern.compile("\\[(.*)]").matcher(temp);
+
+                    if (matcher.find()) {
+                        String altText = matcher.group().substring(1, matcher.group().length() - 1);
+                        String href = matcher.replaceAll("");
+                        docsElement = new AnchorElement(href, altText);
+                    }
+                    docsElements.add(docsElement);
+
+
+                    docsElements.add(new DocsElement(postString));
+
+                    continue;
+                } else if ((matcher = protocolExcludeAltTextPattern.matcher(s)).find()) {
+                    String temp = matcher.group();
+
+                    String preString = s.substring(0, matcher.start());
+                    String postString = s.substring(matcher.end());
+
+                    docsElements.add(new DocsElement(preString));
+
+                    docsElement = new AnchorElement(temp, "");
+                    docsElements.add(docsElement);
+
+                    docsElements.add(new DocsElement(postString));
+
+                    continue;
+                }
+
             }
 
             docsElements.add(docsElement);
@@ -206,4 +266,6 @@ class AsciiDocsDictionaryTest {
 
 
     }
+
+
 }

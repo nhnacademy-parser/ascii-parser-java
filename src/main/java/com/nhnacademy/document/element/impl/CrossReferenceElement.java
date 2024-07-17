@@ -10,23 +10,18 @@ import lombok.Getter;
  */
 
 @Getter
-public class HeadingElement extends DocsElement {
+public class CrossReferenceElement extends DocsElement {
+    private final String target;
+    private final String altText;
 
-    int level;
-
-
-    public HeadingElement(String s) {
-        this(s, 1);
-    }
-
-    public HeadingElement(String value, int level) {
-        super(value);
-        this.level = level;
+    public CrossReferenceElement(String target, String altText) {
+        super(altText);
+        this.target = target;
+        this.altText = altText;
     }
 
     @Override
     public String accept(Visitor visitor) {
         return visitor.visit(this);
     }
-
 }

@@ -1,8 +1,10 @@
 package com.nhnacademy.document.convertor;
 
 import com.nhnacademy.document.element.DocsElement;
+import com.nhnacademy.document.element.impl.AnchorElement;
 import com.nhnacademy.document.element.impl.AttributeElement;
 import com.nhnacademy.document.element.impl.CommentElement;
+import com.nhnacademy.document.element.impl.CrossReferenceElement;
 import com.nhnacademy.document.element.impl.ExampleElement;
 import com.nhnacademy.document.element.impl.HeadingElement;
 import com.nhnacademy.document.element.impl.ImageElement;
@@ -21,10 +23,21 @@ import com.nhnacademy.document.visitor.Visitor;
 
 
 public class HtmlConverter implements Visitor {
+
+    public static final String LINE_BREAK = "\n";
+    public static final String DOUBLE_QUOTES = "\"";
+
     @Override
     public String visit(HeadingElement element) {
+        StringBuilder builder = new StringBuilder();
         String tag = "h" + element.getLevel();
-        return "<" + tag + ">" + element.getValue() + "</" + tag + ">";
+        String id = element.getValue().toString().replace(" ", "_").toLowerCase();
+        builder.append("<").append(tag)
+                .append(" id=").append(DOUBLE_QUOTES).append(id).append(DOUBLE_QUOTES).append(">")
+                .append(element.getValue())
+                .append("</").append(tag).append(">");
+
+        return builder.toString();
     }
 
     @Override
@@ -34,7 +47,7 @@ public class HtmlConverter implements Visitor {
 
     @Override
     public String visit(TitleElement element) {
-        return "<div class=\"title\">" + element.getValue() + "</div>";
+        return "<div class=" + DOUBLE_QUOTES + "title\">" + element.getValue() + "</div>";
     }
 
     @Override
@@ -49,41 +62,42 @@ public class HtmlConverter implements Visitor {
 
     @Override
     public String visit(SideBarElement element) {
-        return "<div class=\"side-bar\">" + element.getValue() + "</div>";
+        return "<div class=" + DOUBLE_QUOTES + "side-bar\">" + element.getValue() + "</div>";
     }
 
     @Override
     public String visit(ImageElement element) {
-        return "<img class=image src=\"" + element.getValue() + "\" " + "alt=\"" + element.getAltString() + "\"/>";
+        return "<img class=image src=" + DOUBLE_QUOTES + element.getValue() + DOUBLE_QUOTES + " alt=" +
+                DOUBLE_QUOTES + element.getAltString() + DOUBLE_QUOTES + "/>";
     }
 
     @Override
     public String visit(TableElement element) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("<table>").append("\n");
+        builder.append("<table>").append(LINE_BREAK);
         {
-            builder.append("<thead>").append("\n");
-            builder.append("<tr>").append("\n");
+            builder.append("<thead>").append(LINE_BREAK);
+            builder.append("<tr>").append(LINE_BREAK);
             for (String columnHeading : element.getColumnHeadings()) {
-                builder.append("<th>").append(columnHeading).append("</th>").append("\n");
+                builder.append("<th>").append(columnHeading).append("</th>").append(LINE_BREAK);
             }
-            builder.append("</tr>").append("\n");
-            builder.append("</thead>").append("\n");
+            builder.append("</tr>").append(LINE_BREAK);
+            builder.append("</thead>").append(LINE_BREAK);
         }
         {
-            builder.append("<tbody>").append("\n");
+            builder.append("<tbody>").append(LINE_BREAK);
             for (String[] row : element.getRows()) {
-                builder.append("<tr>").append("\n");
+                builder.append("<tr>").append(LINE_BREAK);
                 for (String column : row) {
-                    builder.append("<td>").append(column).append("</td>").append("\n");
+                    builder.append("<td>").append(column).append("</td>").append(LINE_BREAK);
                 }
-                builder.append("</tr>").append("\n");
+                builder.append("</tr>").append(LINE_BREAK);
             }
-            builder.append("</tbody>").append("\n");
+            builder.append("</tbody>").append(LINE_BREAK);
         }
 
-        builder.append("</table>").append("\n");
+        builder.append("</table>").append(LINE_BREAK);
 
         return builder.toString();
     }
@@ -92,11 +106,11 @@ public class HtmlConverter implements Visitor {
     public String visit(QuotationElement element) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("<blockquote>").append("\n");
-        builder.append("<div class=\"paragraph\">").append("\n");
-        builder.append("<p>").append(element.getValue()).append("</p>").append("\n");
-        builder.append("</div>").append("\n");
-        builder.append("</blockquote>").append("\n");
+        builder.append("<blockquote>").append(LINE_BREAK);
+        builder.append("<div class=" + DOUBLE_QUOTES + "paragraph\">").append(LINE_BREAK);
+        builder.append("<p>").append(element.getValue()).append("</p>").append(LINE_BREAK);
+        builder.append("</div>").append(LINE_BREAK);
+        builder.append("</blockquote>").append(LINE_BREAK);
         builder.append(this.visit(element.getAttributeElement()));
         return builder.toString();
     }
@@ -105,16 +119,40 @@ public class HtmlConverter implements Visitor {
     public String visit(AttributeElement element) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("<div class=\"attribution\">").append("\n");
-        builder.append("&#8212; ").append(element.getBy()).append("<br>").append("\n");
-        builder.append("<cite>").append(element.getFrom()).append("</cite>").append("\n");
-        builder.append("</div>").append("\n");
+        builder.append("<div class=" + DOUBLE_QUOTES + "attribution\">").append(LINE_BREAK);
+        builder.append("&#8212; ").append(element.getBy()).append("<br>").append(LINE_BREAK);
+        builder.append("<cite>").append(element.getFrom()).append("</cite>").append(LINE_BREAK);
+        builder.append("</div>").append(LINE_BREAK);
         return builder.toString();
     }
 
     @Override
     public String visit(CommentElement element) {
         return "<!--" + element.getValue() + "-->";
+    }
+
+    @Override
+    public String visit(CrossReferenceElement element) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("<a href=").append(DOUBLE_QUOTES).append("#").append(element.getTarget()).append(DOUBLE_QUOTES)
+                .append(">");
+        builder.append(element.getAltText());
+        builder.append("</a>");
+
+        return builder.toString();
+    }
+
+    @Override
+    public String visit(AnchorElement element){
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("<a href=").append(DOUBLE_QUOTES).append(element.getHref()).append(DOUBLE_QUOTES)
+                .append(">");
+        builder.append(element.getAltText());
+        builder.append("</a>");
+
+        return builder.toString();
     }
 
 

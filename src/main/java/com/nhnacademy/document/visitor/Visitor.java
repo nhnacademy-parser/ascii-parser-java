@@ -1,8 +1,10 @@
 package com.nhnacademy.document.visitor;
 
 import com.nhnacademy.document.element.DocsElement;
+import com.nhnacademy.document.element.impl.AnchorElement;
 import com.nhnacademy.document.element.impl.AttributeElement;
 import com.nhnacademy.document.element.impl.CommentElement;
+import com.nhnacademy.document.element.impl.CrossReferenceElement;
 import com.nhnacademy.document.element.impl.ExampleElement;
 import com.nhnacademy.document.element.impl.HeadingElement;
 import com.nhnacademy.document.element.impl.ImageElement;
@@ -40,6 +42,10 @@ public interface Visitor {
 
     String visit(AttributeElement element);
     String visit(CommentElement element);
+
+    String visit(CrossReferenceElement element);
+
+    String visit(AnchorElement element);
 
     String visit(DocsElement element);
 }
